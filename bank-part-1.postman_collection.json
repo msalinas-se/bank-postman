@@ -1,0 +1,781 @@
+{
+  "info": {
+    "name": "Bank - Parte 1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Create personal customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{customerUrl}}/customers",
+              "host": [
+                "{{customerUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"45678912\",\n  \"name\": \"Ana Torres\",\n  \"email\": \"ana@mail.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create business customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{customerUrl}}/customers",
+              "host": [
+                "{{customerUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"BUSINESS\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20123456789\",\n  \"name\": \"Acme SAC\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{customerUrl}}/customers",
+              "host": [
+                "{{customerUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get customer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{customerUrl}}/customers/{{customerId}}",
+              "host": [
+                "{{customerUrl}}"
+              ],
+              "path": [
+                "customers",
+                "{{customerId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{customerUrl}}/customers/{{customerId}}",
+              "host": [
+                "{{customerUrl}}"
+              ],
+              "path": [
+                "customers",
+                "{{customerId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"45678912\",\n  \"name\": \"Ana Maria Torres\",\n  \"email\": \"ana@mail.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete customer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{customerUrl}}/customers/{{customerId}}",
+              "host": [
+                "{{customerUrl}}"
+              ],
+              "path": [
+                "customers",
+                "{{customerId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "Create savings account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accountUrl}}/accounts",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"type\": \"SAVINGS\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create business checking account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accountUrl}}/accounts",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"type\": \"CHECKING\",\n  \"holders\": [\n    {\n      \"documentNumber\": \"40000001\",\n      \"fullName\": \"Luis Rios\"\n    }\n  ],\n  \"authorizedSigners\": [\n    {\n      \"documentNumber\": \"40000002\",\n      \"fullName\": \"Eva Paz\"\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "List accounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{accountUrl}}/accounts",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List customer accounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{accountUrl}}/accounts?customerId={{customerId}}",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ],
+              "query": [
+                {
+                  "key": "customerId",
+                  "value": "{{customerId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get account",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{accountUrl}}/accounts/{{accountId}}",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update account",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accountUrl}}/accounts/{{accountId}}",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"authorizedSigners\": [\n    {\n      \"documentNumber\": \"40000003\",\n      \"fullName\": \"Rosa Diaz\"\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete account",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{accountUrl}}/accounts/{{accountId}}",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Deposit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accountUrl}}/accounts/{{accountId}}/deposits",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}",
+                "deposits"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500\n}"
+            }
+          }
+        },
+        {
+          "name": "Withdrawal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{accountUrl}}/accounts/{{accountId}}/withdrawals",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}",
+                "withdrawals"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 100\n}"
+            }
+          }
+        },
+        {
+          "name": "Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{accountUrl}}/accounts/{{accountId}}/balance",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}",
+                "balance"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Movements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{accountUrl}}/accounts/{{accountId}}/movements",
+              "host": [
+                "{{accountUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}",
+                "movements"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Credits",
+      "item": [
+        {
+          "name": "Create credit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{creditUrl}}/credits",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"amount\": 5000\n}"
+            }
+          }
+        },
+        {
+          "name": "List credits",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credits",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get credit",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credits/{{creditId}}",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update credit",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{creditUrl}}/credits/{{creditId}}",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 6000\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete credit",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credits/{{creditId}}",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Pay credit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{creditUrl}}/credits/{{creditId}}/payments",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000\n}"
+            }
+          }
+        },
+        {
+          "name": "Credit balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credits/{{creditId}}/balance",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}",
+                "balance"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Credit movements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credits/{{creditId}}/movements",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}",
+                "movements"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Credit cards",
+      "item": [
+        {
+          "name": "Create credit card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{creditUrl}}/credit-cards",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credit-cards"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"creditLimit\": 3000\n}"
+            }
+          }
+        },
+        {
+          "name": "List credit cards",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credit-cards",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credit-cards"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get credit card",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update credit limit",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 5000\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete credit card",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Charge",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}/charges",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "charges"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 800\n}"
+            }
+          }
+        },
+        {
+          "name": "Pay credit card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}/payments",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 300\n}"
+            }
+          }
+        },
+        {
+          "name": "Credit card balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}/balance",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "balance"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Credit card movements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}/movements",
+              "host": [
+                "{{creditUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "movements"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "customerUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "accountUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "creditUrl",
+      "value": "http://localhost:8083"
+    },
+    {
+      "key": "customerId",
+      "value": ""
+    },
+    {
+      "key": "businessCustomerId",
+      "value": ""
+    },
+    {
+      "key": "accountId",
+      "value": ""
+    },
+    {
+      "key": "creditId",
+      "value": ""
+    },
+    {
+      "key": "creditCardId",
+      "value": ""
+    }
+  ]
+}
