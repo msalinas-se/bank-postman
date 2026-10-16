@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "Bank - Parte 1",
+    "name": "Bank",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -18,9 +18,9 @@
               }
             ],
             "url": {
-              "raw": "{{customerUrl}}/customers",
+              "raw": "{{baseUrl}}/customers",
               "host": [
-                "{{customerUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "customers"
@@ -43,9 +43,9 @@
               }
             ],
             "url": {
-              "raw": "{{customerUrl}}/customers",
+              "raw": "{{baseUrl}}/customers",
               "host": [
-                "{{customerUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "customers"
@@ -58,14 +58,64 @@
           }
         },
         {
+          "name": "Create VIP customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"profile\": \"VIP\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"22222222\",\n  \"name\": \"Bruno Diaz\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create PYME customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"BUSINESS\",\n  \"profile\": \"PYME\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20111111111\",\n  \"name\": \"Pyme SAC\"\n}"
+            }
+          }
+        },
+        {
           "name": "List customers",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{customerUrl}}/customers",
+              "raw": "{{baseUrl}}/customers",
               "host": [
-                "{{customerUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "customers"
@@ -79,9 +129,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{customerUrl}}/customers/{{customerId}}",
+              "raw": "{{baseUrl}}/customers/{{customerId}}",
               "host": [
-                "{{customerUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "customers",
@@ -101,9 +151,9 @@
               }
             ],
             "url": {
-              "raw": "{{customerUrl}}/customers/{{customerId}}",
+              "raw": "{{baseUrl}}/customers/{{customerId}}",
               "host": [
-                "{{customerUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "customers",
@@ -122,9 +172,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{customerUrl}}/customers/{{customerId}}",
+              "raw": "{{baseUrl}}/customers/{{customerId}}",
               "host": [
-                "{{customerUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "customers",
@@ -149,9 +199,9 @@
               }
             ],
             "url": {
-              "raw": "{{accountUrl}}/accounts",
+              "raw": "{{baseUrl}}/accounts",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts"
@@ -159,7 +209,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"type\": \"SAVINGS\"\n}"
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"type\": \"SAVINGS\",\n  \"openingAmount\": 0\n}"
             }
           }
         },
@@ -174,9 +224,9 @@
               }
             ],
             "url": {
-              "raw": "{{accountUrl}}/accounts",
+              "raw": "{{baseUrl}}/accounts",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts"
@@ -184,7 +234,57 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"type\": \"CHECKING\",\n  \"holders\": [\n    {\n      \"documentNumber\": \"40000001\",\n      \"fullName\": \"Luis Rios\"\n    }\n  ],\n  \"authorizedSigners\": [\n    {\n      \"documentNumber\": \"40000002\",\n      \"fullName\": \"Eva Paz\"\n    }\n  ]\n}"
+              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"type\": \"CHECKING\",\n  \"openingAmount\": 100,\n  \"holders\": [\n    {\n      \"documentNumber\": \"40000001\",\n      \"fullName\": \"Luis Rios\"\n    }\n  ],\n  \"authorizedSigners\": [\n    {\n      \"documentNumber\": \"40000002\",\n      \"fullName\": \"Eva Paz\"\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Create VIP savings account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"type\": \"SAVINGS\",\n  \"openingAmount\": 600\n}"
+            }
+          }
+        },
+        {
+          "name": "Create PYME checking account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{pymeCustomerId}}\",\n  \"type\": \"CHECKING\",\n  \"openingAmount\": 100,\n  \"holders\": [\n    {\n      \"documentNumber\": \"40000001\",\n      \"fullName\": \"Luis Rios\"\n    }\n  ]\n}"
             }
           }
         },
@@ -194,9 +294,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{accountUrl}}/accounts",
+              "raw": "{{baseUrl}}/accounts",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts"
@@ -210,9 +310,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{accountUrl}}/accounts?customerId={{customerId}}",
+              "raw": "{{baseUrl}}/accounts?customerId={{customerId}}",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts"
@@ -232,9 +332,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{accountUrl}}/accounts/{{accountId}}",
+              "raw": "{{baseUrl}}/accounts/{{accountId}}",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
@@ -254,9 +354,9 @@
               }
             ],
             "url": {
-              "raw": "{{accountUrl}}/accounts/{{accountId}}",
+              "raw": "{{baseUrl}}/accounts/{{accountId}}",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
@@ -275,9 +375,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{accountUrl}}/accounts/{{accountId}}",
+              "raw": "{{baseUrl}}/accounts/{{accountId}}",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
@@ -297,9 +397,9 @@
               }
             ],
             "url": {
-              "raw": "{{accountUrl}}/accounts/{{accountId}}/deposits",
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/deposits",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
@@ -324,9 +424,9 @@
               }
             ],
             "url": {
-              "raw": "{{accountUrl}}/accounts/{{accountId}}/withdrawals",
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/withdrawals",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
@@ -346,9 +446,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{accountUrl}}/accounts/{{accountId}}/balance",
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/balance",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
@@ -364,14 +464,59 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{accountUrl}}/accounts/{{accountId}}/movements",
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/movements",
               "host": [
-                "{{accountUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
                 "{{accountId}}",
                 "movements"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Transfer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/transfers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "transfers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromAccountId\": \"{{accountId}}\",\n  \"toAccountId\": \"{{toAccountId}}\",\n  \"amount\": 50\n}"
+            }
+          }
+        },
+        {
+          "name": "Last 10 movements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/movements/last",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}",
+                "movements",
+                "last"
               ]
             }
           }
@@ -392,9 +537,9 @@
               }
             ],
             "url": {
-              "raw": "{{creditUrl}}/credits",
+              "raw": "{{baseUrl}}/credits",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credits"
@@ -412,9 +557,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credits",
+              "raw": "{{baseUrl}}/credits",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credits"
@@ -428,9 +573,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credits/{{creditId}}",
+              "raw": "{{baseUrl}}/credits/{{creditId}}",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credits",
@@ -450,9 +595,9 @@
               }
             ],
             "url": {
-              "raw": "{{creditUrl}}/credits/{{creditId}}",
+              "raw": "{{baseUrl}}/credits/{{creditId}}",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credits",
@@ -471,9 +616,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credits/{{creditId}}",
+              "raw": "{{baseUrl}}/credits/{{creditId}}",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credits",
@@ -493,9 +638,9 @@
               }
             ],
             "url": {
-              "raw": "{{creditUrl}}/credits/{{creditId}}/payments",
+              "raw": "{{baseUrl}}/credits/{{creditId}}/payments",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credits",
@@ -515,9 +660,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credits/{{creditId}}/balance",
+              "raw": "{{baseUrl}}/credits/{{creditId}}/balance",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credits",
@@ -533,9 +678,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credits/{{creditId}}/movements",
+              "raw": "{{baseUrl}}/credits/{{creditId}}/movements",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credits",
@@ -561,9 +706,9 @@
               }
             ],
             "url": {
-              "raw": "{{creditUrl}}/credit-cards",
+              "raw": "{{baseUrl}}/credit-cards",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credit-cards"
@@ -581,9 +726,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credit-cards",
+              "raw": "{{baseUrl}}/credit-cards",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credit-cards"
@@ -597,9 +742,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}",
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credit-cards",
@@ -619,9 +764,9 @@
               }
             ],
             "url": {
-              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}",
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credit-cards",
@@ -640,9 +785,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}",
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credit-cards",
@@ -662,9 +807,9 @@
               }
             ],
             "url": {
-              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}/charges",
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/charges",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credit-cards",
@@ -689,9 +834,9 @@
               }
             ],
             "url": {
-              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}/payments",
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/payments",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credit-cards",
@@ -711,9 +856,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}/balance",
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/balance",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credit-cards",
@@ -729,14 +874,92 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{creditUrl}}/credit-cards/{{creditCardId}}/movements",
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/movements",
               "host": [
-                "{{creditUrl}}"
+                "{{baseUrl}}"
               ],
               "path": [
                 "credit-cards",
                 "{{creditCardId}}",
                 "movements"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Last 10 movements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/movements/last",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "movements",
+                "last"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Accounts report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/report?from=2026-10-01&to=2026-10-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "report"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Credits report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credits/report?from=2026-10-01&to=2026-10-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credits",
+                "report"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2026-10-31"
+                }
               ]
             }
           }
@@ -746,16 +969,8 @@
   ],
   "variable": [
     {
-      "key": "customerUrl",
-      "value": "http://localhost:8081"
-    },
-    {
-      "key": "accountUrl",
-      "value": "http://localhost:8082"
-    },
-    {
-      "key": "creditUrl",
-      "value": "http://localhost:8083"
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
     },
     {
       "key": "customerId",
@@ -766,7 +981,19 @@
       "value": ""
     },
     {
+      "key": "vipCustomerId",
+      "value": ""
+    },
+    {
+      "key": "pymeCustomerId",
+      "value": ""
+    },
+    {
       "key": "accountId",
+      "value": ""
+    },
+    {
+      "key": "toAccountId",
       "value": ""
     },
     {
