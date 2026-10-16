@@ -3,12 +3,34 @@
     "name": "Bank",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
   "item": [
     {
-      "name": "Customers",
+      "name": "1. Auth",
       "item": [
         {
-          "name": "Create personal customer",
+          "name": "Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -18,22 +40,137 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/customers",
+              "raw": "{{baseUrl}}/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "customers"
+                "auth",
+                "login"
               ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"45678912\",\n  \"name\": \"Ana Torres\",\n  \"email\": \"ana@mail.com\"\n}"
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
             }
           }
         },
         {
-          "name": "Create business customer",
+          "name": "Login user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"userToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user\",\n  \"password\": \"user123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Request without token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Customers",
+      "item": [
+        {
+          "name": "Create personal customer",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"doc1\", \"4\" + Math.floor(Math.random() * 1e7).toString().padStart(7, \"0\"));",
+                  "pm.collectionVariables.set(\"doc2\", \"5\" + Math.floor(Math.random() * 1e7).toString().padStart(7, \"0\"));",
+                  "pm.collectionVariables.set(\"doc3\", \"6\" + Math.floor(Math.random() * 1e7).toString().padStart(7, \"0\"));",
+                  "pm.collectionVariables.set(\"doc4\", \"7\" + Math.floor(Math.random() * 1e7).toString().padStart(7, \"0\"));",
+                  "pm.collectionVariables.set(\"ruc\", \"20\" + Math.floor(Math.random() * 1e9).toString().padStart(9, \"0\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"customerId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -53,12 +190,71 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"type\": \"BUSINESS\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20123456789\",\n  \"name\": \"Acme SAC\"\n}"
+              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{doc1}}\",\n  \"name\": \"Ana Torres\",\n  \"email\": \"ana@mail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create second personal customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"otherCustomerId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{doc2}}\",\n  \"name\": \"Bruno Diaz\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
           "name": "Create VIP customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"vipCustomerId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -78,12 +274,29 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"profile\": \"VIP\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"22222222\",\n  \"name\": \"Bruno Diaz\"\n}"
+              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"profile\": \"VIP\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{doc3}}\",\n  \"name\": \"Carla Rios\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
           "name": "Create PYME customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"pymeCustomerId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -103,12 +316,70 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"type\": \"BUSINESS\",\n  \"profile\": \"PYME\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20111111111\",\n  \"name\": \"Pyme SAC\"\n}"
+              "raw": "{\n  \"type\": \"BUSINESS\",\n  \"profile\": \"PYME\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"{{ruc}}\",\n  \"name\": \"Pyme SAC\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Duplicate document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Code DUPLICATE_DOCUMENT\", () => pm.expect(pm.response.json().code).to.eql(\"DUPLICATE_DOCUMENT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{doc1}}\",\n  \"name\": \"Otra\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
           "name": "List customers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -124,7 +395,18 @@
           }
         },
         {
-          "name": "Get customer",
+          "name": "Get customer (Redis cache)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -142,6 +424,17 @@
         },
         {
           "name": "Update customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -162,23 +455,660 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"45678912\",\n  \"name\": \"Ana Maria Torres\",\n  \"email\": \"ana@mail.com\"\n}"
+              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{doc1}}\",\n  \"name\": \"Ana Maria Torres\",\n  \"email\": \"ana@mail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "3. Credits and credit cards",
+      "item": [
         {
-          "name": "Delete customer",
+          "name": "Create credit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"creditId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "DELETE",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/customers/{{customerId}}",
+              "raw": "{{baseUrl}}/credits",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "customers",
-                "{{customerId}}"
+                "credits"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"amount\": 5000,\n  \"dueDate\": \"2027-01-15\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Second personal credit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Code CREDIT_LIMIT_REACHED\", () => pm.expect(pm.response.json().code).to.eql(\"CREDIT_LIMIT_REACHED\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credits",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credits"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"amount\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List credits",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credits?customerId={{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credits"
+              ],
+              "query": [
+                {
+                  "key": "customerId",
+                  "value": "{{customerId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get credit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credits/{{creditId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Pay credit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credits/{{creditId}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Pay credit from third party",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credits/{{creditId}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500,\n  \"payerId\": \"{{otherCustomerId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Credit balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credits/{{creditId}}/balance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}",
+                "balance"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Credit movements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credits/{{creditId}}/movements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{creditId}}",
+                "movements"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create credit card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"creditCardId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"creditLimit\": 3000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create credit card for VIP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"creditLimit\": 2000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create credit card for PYME",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{pymeCustomerId}}\",\n  \"creditLimit\": 8000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Charge",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/charges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "charges"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 800\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Charge over the limit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Code CREDIT_LIMIT_EXCEEDED\", () => pm.expect(pm.response.json().code).to.eql(\"CREDIT_LIMIT_EXCEEDED\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/charges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "charges"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 9000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Pay credit card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 300\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update credit limit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 5000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Credit card balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/balance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "balance"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Last 10 credit card movements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/movements/last",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}",
+                "movements",
+                "last"
               ]
             }
           }
@@ -186,10 +1116,22 @@
       ]
     },
     {
-      "name": "Accounts",
+      "name": "4. Accounts",
       "item": [
         {
-          "name": "Create savings account",
+          "name": "Create checking account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"accountId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -209,12 +1151,29 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"type\": \"SAVINGS\",\n  \"openingAmount\": 0\n}"
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"type\": \"CHECKING\",\n  \"openingAmount\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Create business checking account",
+          "name": "Create savings account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"savingsAccountId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -234,12 +1193,112 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerId\": \"{{businessCustomerId}}\",\n  \"type\": \"CHECKING\",\n  \"openingAmount\": 100,\n  \"holders\": [\n    {\n      \"documentNumber\": \"40000001\",\n      \"fullName\": \"Luis Rios\"\n    }\n  ],\n  \"authorizedSigners\": [\n    {\n      \"documentNumber\": \"40000002\",\n      \"fullName\": \"Eva Paz\"\n    }\n  ]\n}"
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"type\": \"SAVINGS\",\n  \"openingAmount\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Second savings account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Code ACCOUNT_LIMIT_REACHED\", () => pm.expect(pm.response.json().code).to.eql(\"ACCOUNT_LIMIT_REACHED\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"type\": \"SAVINGS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Opening amount below minimum",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Code MINIMUM_OPENING_AMOUNT\", () => pm.expect(pm.response.json().code).to.eql(\"MINIMUM_OPENING_AMOUNT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"type\": \"FIXED_TERM\",\n  \"openingAmount\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
           "name": "Create VIP savings account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -259,12 +1318,30 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"type\": \"SAVINGS\",\n  \"openingAmount\": 600\n}"
+              "raw": "{\n  \"customerId\": \"{{vipCustomerId}}\",\n  \"type\": \"SAVINGS\",\n  \"openingAmount\": 600\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
           "name": "Create PYME checking account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"pymeAccountId\", pm.response.json().id);",
+                  "pm.test(\"No maintenance fee\", () => pm.expect(pm.response.json().maintenanceFee).to.eql(0));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -284,15 +1361,36 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerId\": \"{{pymeCustomerId}}\",\n  \"type\": \"CHECKING\",\n  \"openingAmount\": 100,\n  \"holders\": [\n    {\n      \"documentNumber\": \"40000001\",\n      \"fullName\": \"Luis Rios\"\n    }\n  ]\n}"
+              "raw": "{\n  \"customerId\": \"{{pymeCustomerId}}\",\n  \"type\": \"CHECKING\",\n  \"openingAmount\": 100,\n  \"holders\": [\n    {\n      \"documentNumber\": \"40000001\",\n      \"fullName\": \"Luis Rios\"\n    }\n  ],\n  \"authorizedSigners\": [\n    {\n      \"documentNumber\": \"40000002\",\n      \"fullName\": \"Eva Paz\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "List accounts",
+          "name": "PYME savings account not allowed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/accounts",
               "host": [
@@ -301,11 +1399,31 @@
               "path": [
                 "accounts"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{pymeCustomerId}}\",\n  \"type\": \"SAVINGS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
           "name": "List customer accounts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -328,6 +1446,17 @@
         },
         {
           "name": "Get account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -344,7 +1473,18 @@
           }
         },
         {
-          "name": "Update account",
+          "name": "Update PYME account holders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -354,40 +1494,39 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/accounts/{{accountId}}",
+              "raw": "{{baseUrl}}/accounts/{{pymeAccountId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
-                "{{accountId}}"
+                "{{pymeAccountId}}"
               ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"authorizedSigners\": [\n    {\n      \"documentNumber\": \"40000003\",\n      \"fullName\": \"Rosa Diaz\"\n    }\n  ]\n}"
-            }
-          }
-        },
-        {
-          "name": "Delete account",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/accounts/{{accountId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "accounts",
-                "{{accountId}}"
-              ]
+              "raw": "{\n  \"holders\": [\n    {\n      \"documentNumber\": \"40000001\",\n      \"fullName\": \"Luis Rios\"\n    },\n    {\n      \"documentNumber\": \"40000003\",\n      \"fullName\": \"Rosa Diaz\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
           "name": "Deposit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -397,24 +1536,40 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/accounts/{{accountId}}/deposits",
+              "raw": "{{baseUrl}}/accounts/{{savingsAccountId}}/deposits",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
-                "{{accountId}}",
+                "{{savingsAccountId}}",
                 "deposits"
               ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 500\n}"
+              "raw": "{\n  \"amount\": 500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
           "name": "Withdrawal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -424,60 +1579,84 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/accounts/{{accountId}}/withdrawals",
+              "raw": "{{baseUrl}}/accounts/{{savingsAccountId}}/withdrawals",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
-                "{{accountId}}",
+                "{{savingsAccountId}}",
                 "withdrawals"
               ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 100\n}"
+              "raw": "{\n  \"amount\": 50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Balance",
+          "name": "Withdrawal without funds",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Code INSUFFICIENT_FUNDS\", () => pm.expect(pm.response.json().code).to.eql(\"INSUFFICIENT_FUNDS\"));"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/accounts/{{accountId}}/balance",
+              "raw": "{{baseUrl}}/accounts/{{savingsAccountId}}/withdrawals",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
-                "{{accountId}}",
-                "balance"
+                "{{savingsAccountId}}",
+                "withdrawals"
               ]
-            }
-          }
-        },
-        {
-          "name": "Movements",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/accounts/{{accountId}}/movements",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "accounts",
-                "{{accountId}}",
-                "movements"
-              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 99999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
           "name": "Transfer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -498,23 +1677,97 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fromAccountId\": \"{{accountId}}\",\n  \"toAccountId\": \"{{toAccountId}}\",\n  \"amount\": 50\n}"
+              "raw": "{\n  \"fromAccountId\": \"{{savingsAccountId}}\",\n  \"toAccountId\": \"{{accountId}}\",\n  \"amount\": 50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Last 10 movements",
+          "name": "Account balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/accounts/{{accountId}}/movements/last",
+              "raw": "{{baseUrl}}/accounts/{{accountId}}/balance",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "accounts",
                 "{{accountId}}",
+                "balance"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Account movements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{savingsAccountId}}/movements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{savingsAccountId}}",
+                "movements"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Last 10 account movements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{savingsAccountId}}/movements/last",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{savingsAccountId}}",
                 "movements",
                 "last"
               ]
@@ -524,10 +1777,319 @@
       ]
     },
     {
-      "name": "Credits",
+      "name": "5. Debit cards",
       "item": [
         {
-          "name": "Create credit",
+          "name": "Create debit card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"debitCardId\", pm.response.json().id);",
+                  "pm.collectionVariables.set(\"debitCardNumber\", pm.response.json().cardNumber);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/debit-cards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "debit-cards"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"mainAccountId\": \"{{accountId}}\",\n  \"accountIds\": [\n    \"{{savingsAccountId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Pay with debit card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Paid from savings because main account has 150\", () => pm.expect(pm.response.json().accountId).to.eql(pm.collectionVariables.get(\"savingsAccountId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/debit-cards/{{debitCardId}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "debit-cards",
+                "{{debitCardId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 300\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Pay without funds",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/debit-cards/{{debitCardId}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "debit-cards",
+                "{{debitCardId}}",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 99999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List debit cards",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/debit-cards?customerId={{customerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "debit-cards"
+              ],
+              "query": [
+                {
+                  "key": "customerId",
+                  "value": "{{customerId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get debit card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/debit-cards/{{debitCardId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "debit-cards",
+                "{{debitCardId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Debit card balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/debit-cards/{{debitCardId}}/balance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "debit-cards",
+                "{{debitCardId}}",
+                "balance"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Last 10 debit card movements",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/debit-cards/{{debitCardId}}/movements/last",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "debit-cards",
+                "{{debitCardId}}",
+                "movements",
+                "last"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Overdue debt",
+      "item": [
+        {
+          "name": "Customer with expired credit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"debtorId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"PERSONAL\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"{{doc4}}\",\n  \"name\": \"Diego Paz\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create expired credit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"expiredCreditId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -547,88 +2109,38 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"amount\": 5000\n}"
-            }
-          }
-        },
-        {
-          "name": "List credits",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/credits",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credits"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get credit",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/credits/{{creditId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credits",
-                "{{creditId}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update credit",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+              "raw": "{\n  \"customerId\": \"{{debtorId}}\",\n  \"amount\": 1000,\n  \"dueDate\": \"2026-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
               }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/credits/{{creditId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credits",
-                "{{creditId}}"
-              ]
+            }
+          }
+        },
+        {
+          "name": "Open account with overdue debt",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "setTimeout(() => {}, 3000);"
+                ]
+              }
             },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 6000\n}"
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Code OVERDUE_DEBT\", () => pm.expect(pm.response.json().code).to.eql(\"OVERDUE_DEBT\"));"
+                ]
+              }
             }
-          }
-        },
-        {
-          "name": "Delete credit",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/credits/{{creditId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credits",
-                "{{creditId}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Pay credit",
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -638,65 +2150,188 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/credits/{{creditId}}/payments",
+              "raw": "{{baseUrl}}/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{debtorId}}\",\n  \"type\": \"SAVINGS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Credit card with overdue debt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Code OVERDUE_DEBT\", () => pm.expect(pm.response.json().code).to.eql(\"OVERDUE_DEBT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{debtorId}}\",\n  \"creditLimit\": 500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Third party pays the debt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credits/{{expiredCreditId}}/payments",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "credits",
-                "{{creditId}}",
+                "{{expiredCreditId}}",
                 "payments"
               ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 1000\n}"
+              "raw": "{\n  \"amount\": 1000,\n  \"payerId\": \"{{customerId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "Credit balance",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/credits/{{creditId}}/balance",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credits",
-                "{{creditId}}",
-                "balance"
-              ]
+          "name": "Open account after paying",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "setTimeout(() => {}, 3000);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
             }
-          }
-        },
-        {
-          "name": "Credit movements",
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/credits/{{creditId}}/movements",
+              "raw": "{{baseUrl}}/accounts",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "credits",
-                "{{creditId}}",
-                "movements"
+                "accounts"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"{{debtorId}}\",\n  \"type\": \"SAVINGS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         }
       ]
     },
     {
-      "name": "Credit cards",
+      "name": "7. Yanki",
       "item": [
         {
-          "name": "Create credit card",
+          "name": "Create wallet",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"phone1\", \"9\" + Math.floor(Math.random() * 1e8).toString().padStart(8, \"0\"));",
+                  "pm.collectionVariables.set(\"phone2\", \"9\" + Math.floor(Math.random() * 1e8).toString().padStart(8, \"0\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -706,55 +2341,340 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/credit-cards",
+              "raw": "{{baseUrl}}/wallets",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "credit-cards"
+                "wallets"
               ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"creditLimit\": 3000\n}"
+              "raw": "{\n  \"documentType\": \"CEX\",\n  \"documentNumber\": \"000123456\",\n  \"phone\": \"{{phone1}}\",\n  \"imei\": \"356938035643809\",\n  \"email\": \"w1@mail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
         {
-          "name": "List credit cards",
+          "name": "Create second wallet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/credit-cards",
+              "raw": "{{baseUrl}}/wallets",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "credit-cards"
+                "wallets"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentType\": \"PASSPORT\",\n  \"documentNumber\": \"P1234567\",\n  \"phone\": \"{{phone2}}\",\n  \"imei\": \"356938035643810\",\n  \"email\": \"w2@mail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Payment without balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Code INSUFFICIENT_FUNDS\", () => pm.expect(pm.response.json().code).to.eql(\"INSUFFICIENT_FUNDS\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromPhone\": \"{{phone2}}\",\n  \"toPhone\": \"{{phone1}}\",\n  \"amount\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Link debit card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 202\", () => pm.response.to.have.status(202));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{phone1}}/debit-card",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{phone1}}",
+                "debit-card"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cardNumber\": \"{{debitCardNumber}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get wallet with card",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "setTimeout(() => {}, 3000);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Card linked\", () => pm.expect(pm.response.json().debitCardNumber).to.eql(pm.collectionVariables.get(\"debitCardNumber\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{phone1}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{phone1}}"
               ]
             }
           }
         },
         {
-          "name": "Get credit card",
+          "name": "Send payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}",
+              "raw": "{{baseUrl}}/wallets/payments",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "credit-cards",
-                "{{creditCardId}}"
+                "wallets",
+                "payments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromPhone\": \"{{phone1}}\",\n  \"toPhone\": \"{{phone2}}\",\n  \"amount\": 40\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Received payments",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "setTimeout(() => {}, 3000);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Completed\", () => pm.expect(pm.response.json()[0].status).to.eql(\"COMPLETED\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{phone2}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{phone2}}",
+                "payments"
               ]
             }
           }
         },
         {
-          "name": "Update credit limit",
+          "name": "Wallet balance",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Balance 40\", () => pm.expect(pm.response.json().balance).to.eql(40));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{phone2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{phone2}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List wallets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update wallet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -764,159 +2684,60 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}",
+              "raw": "{{baseUrl}}/wallets/{{phone2}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "credit-cards",
-                "{{creditCardId}}"
+                "wallets",
+                "{{phone2}}"
               ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 5000\n}"
-            }
-          }
-        },
-        {
-          "name": "Delete credit card",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credit-cards",
-                "{{creditCardId}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Charge",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+              "raw": "{\n  \"documentType\": \"PASSPORT\",\n  \"documentNumber\": \"P1234567\",\n  \"phone\": \"{{phone2}}\",\n  \"imei\": \"356938035643899\",\n  \"email\": \"w2@mail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
               }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/charges",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credit-cards",
-                "{{creditCardId}}",
-                "charges"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 800\n}"
-            }
-          }
-        },
-        {
-          "name": "Pay credit card",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/payments",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credit-cards",
-                "{{creditCardId}}",
-                "payments"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 300\n}"
-            }
-          }
-        },
-        {
-          "name": "Credit card balance",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/balance",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credit-cards",
-                "{{creditCardId}}",
-                "balance"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Credit card movements",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/movements",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credit-cards",
-                "{{creditCardId}}",
-                "movements"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Last 10 movements",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}/movements/last",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "credit-cards",
-                "{{creditCardId}}",
-                "movements",
-                "last"
-              ]
             }
           }
         }
       ]
     },
     {
-      "name": "Reports",
+      "name": "8. Reports",
       "item": [
         {
           "name": "Accounts report",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date();",
+                  "pm.collectionVariables.set(\"from\", new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10));",
+                  "pm.collectionVariables.set(\"to\", d.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/accounts/report?from=2026-10-01&to=2026-10-31",
+              "raw": "{{baseUrl}}/accounts/report?from={{from}}&to={{to}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -927,11 +2748,11 @@
               "query": [
                 {
                   "key": "from",
-                  "value": "2026-10-01"
+                  "value": "{{from}}"
                 },
                 {
                   "key": "to",
-                  "value": "2026-10-31"
+                  "value": "{{to}}"
                 }
               ]
             }
@@ -939,11 +2760,22 @@
         },
         {
           "name": "Credits report",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/credits/report?from=2026-10-01&to=2026-10-31",
+              "raw": "{{baseUrl}}/credits/report?from={{from}}&to={{to}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -954,12 +2786,223 @@
               "query": [
                 {
                   "key": "from",
-                  "value": "2026-10-01"
+                  "value": "{{from}}"
                 },
                 {
                   "key": "to",
-                  "value": "2026-10-31"
+                  "value": "{{to}}"
                 }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Authorization and deletes",
+      "item": [
+        {
+          "name": "Delete with USER role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{phone2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{phone2}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete wallet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/wallets/{{phone2}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "wallets",
+                "{{phone2}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete debit card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/debit-cards/{{debitCardId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "debit-cards",
+                "{{debitCardId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/{{pymeAccountId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "{{pymeAccountId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete credit card",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credit-cards/{{creditCardId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credit-cards",
+                "{{creditCardId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete credit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/credits/{{expiredCreditId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "credits",
+                "{{expiredCreditId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customers/{{debtorId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "customers",
+                "{{debtorId}}"
               ]
             }
           }
@@ -971,38 +3014,6 @@
     {
       "key": "baseUrl",
       "value": "http://localhost:8080"
-    },
-    {
-      "key": "customerId",
-      "value": ""
-    },
-    {
-      "key": "businessCustomerId",
-      "value": ""
-    },
-    {
-      "key": "vipCustomerId",
-      "value": ""
-    },
-    {
-      "key": "pymeCustomerId",
-      "value": ""
-    },
-    {
-      "key": "accountId",
-      "value": ""
-    },
-    {
-      "key": "toAccountId",
-      "value": ""
-    },
-    {
-      "key": "creditId",
-      "value": ""
-    },
-    {
-      "key": "creditCardId",
-      "value": ""
     }
   ]
 }
